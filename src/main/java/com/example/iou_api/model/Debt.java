@@ -2,7 +2,7 @@ package com.example.iou_api.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "debts")
@@ -10,20 +10,20 @@ public class Debt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "debt_id")
-    private Long debtId;
+    @Column(name = "debt_id", nullable = false)
+    private Integer debtId;
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
     @ManyToOne
-    @JoinColumn(name = "lender_id", nullable = false)
-    private GroupMember lender;
+    @JoinColumn(name = "creditor_id", nullable = false)
+    private GroupMember creditor;
 
     @ManyToOne
-    @JoinColumn(name = "borrower_id", nullable = false)
-    private GroupMember borrower;
+    @JoinColumn(name = "debtor_id", nullable = false)
+    private GroupMember debtor;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
@@ -35,27 +35,27 @@ public class Debt {
     @Column(name = "status", nullable = false)
     private DebtStatus status;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private Timestamp createdAt;
 
     public Debt() {
     }
 
-    public Debt(Group group, GroupMember lender, GroupMember borrower, BigDecimal amount, String description, DebtStatus status) {
+    public Debt(Group group, GroupMember creditor, GroupMember debtor, BigDecimal amount, String description, DebtStatus status) {
         this.group = group;
-        this.lender = lender;
-        this.borrower = borrower;
+        this.creditor = creditor;
+        this.debtor = debtor;
         this.amount = amount;
         this.description = description;
         this.status = status;
     }
 
     // Getters and Setters
-    public Long getDebtId() {
+    public Integer getDebtId() {
         return debtId;
     }
 
-    public void setDebtId(Long debtId) {
+    public void setDebtId(Integer debtId) {
         this.debtId = debtId;
     }
 
@@ -67,20 +67,20 @@ public class Debt {
         this.group = group;
     }
 
-    public GroupMember getLender() {
-        return lender;
+    public GroupMember getCreditor() {
+        return creditor;
     }
 
-    public void setLender(GroupMember lender) {
-        this.lender = lender;
+    public void setCreditor(GroupMember creditor) {
+        this.creditor = creditor;
     }
 
-    public GroupMember getBorrower() {
-        return borrower;
+    public GroupMember getDebtor() {
+        return debtor;
     }
 
-    public void setBorrower(GroupMember borrower) {
-        this.borrower = borrower;
+    public void setDebtor(GroupMember debtor) {
+        this.debtor = debtor;
     }
 
     public BigDecimal getAmount() {
@@ -107,11 +107,11 @@ public class Debt {
         this.status = status;
     }
 
-    public Instant getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 }

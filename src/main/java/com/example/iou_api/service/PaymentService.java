@@ -1,10 +1,14 @@
 package com.example.iou_api.service;
 
+import com.example.iou_api.dto.PaymentDTO;
 import com.example.iou_api.model.Debt;
+import com.example.iou_api.model.DebtStatus;
+import com.example.iou_api.model.GroupMember;
 import com.example.iou_api.model.Payment;
+import com.example.iou_api.repository.DebtRepository;
+import com.example.iou_api.repository.GroupMemberRepository;
 import com.example.iou_api.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,31 +19,53 @@ import java.util.List;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final DebtService debtService;
+    private final DebtRepository debtRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
-    @Autowired
-    public PaymentService(PaymentRepository paymentRepository, DebtService debtService) {
+    public PaymentService(PaymentRepository paymentRepository, DebtService debtService, DebtRepository debtRepository, GroupMemberRepository groupMemberRepository) {
         this.paymentRepository = paymentRepository;
         this.debtService = debtService;
+        this.debtRepository = debtRepository;
+        this.groupMemberRepository = groupMemberRepository;
     }
 
-    public Payment recordPayment(Payment payment) {
-        Payment savedPayment = paymentRepository.save(payment);
+    public PaymentDTO recordPayment(PaymentDTO paymentDTO) {
 
-        // Check if full payment is completed
-        Debt debt = debtService.getDebtById(payment.getDebt().getDebtId())
-                .orElseThrow(() -> new RuntimeException("Debt not found"));
+        boolean isPaidOff = false;
 
-        BigDecimal totalPaid = paymentRepository.sumPaymentsByDebtId(debt.getDebtId());
+        // Get and validate debt and payer
+        Debt debt = debtRepository.findById(paymentDTO.getDebtId())
+                .orElseThrow(() -> new IllegalArgumentException("Debt not found"));
 
-        if (totalPaid.compareTo(debt.getAmount()) >= 0) {
-            debtService.markDebtAsPaid(debt.getDebtId());
+        // Check if debt is pending
+        if(!debt.getStatus().equals(DebtStatus.PENDING)){
+            throw new IllegalArgumentException("Debt is already paid");
         }
 
-        return savedPayment;
+        GroupMember payer = groupMemberRepository.findById(paymentDTO.getPayerMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Payer not found"));
+
+        // Check that payer is associated with the group
+        if (!debt.getGroup().getGroupId().equals(payer.getGroup().getGroupId())) {
+            throw new IllegalArgumentException("Payer is not part of the debt's group");
+        }
+
+        // Create payment
+        Payment payment = new Payment(debt, payer, paymentDTO.getAmount());
+        Payment savedPayment = paymentRepository.save(payment);
+
+        // Check if debt is fully paid
+        BigDecimal totalPaid = paymentRepository.sumPaymentsByDebtId(debt.getDebtId());
+        if (totalPaid.compareTo(debt.getAmount()) >= 0) {
+            debtService.markDebtAsPaid(debt.getDebtId());
+            isPaidOff = true;
+        }
+
+        return new PaymentDTO(debt.getDebtId(), savedPayment.getPayer().getMemberId(), savedPayment.getAmount(), isPaidOff, savedPayment.getPaymentId());
     }
 
-    public List<Payment> getPaymentsByDebtId(Long debtId) {
-        return paymentRepository.findByDebtId(debtId);
+    public List<Payment> getPaymentsByDebtId(Integer debtId) {
+        return paymentRepository.findByDebt_DebtId(debtId);
     }
 }
 

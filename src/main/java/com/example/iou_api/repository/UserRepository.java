@@ -3,10 +3,9 @@ package com.example.iou_api.repository;
 import com.example.iou_api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByAuthUserId(Long authUserId);
+public interface UserRepository extends JpaRepository<User, Integer> {
+    Optional<User> findByAuthUserId(Integer authUserId);
 }

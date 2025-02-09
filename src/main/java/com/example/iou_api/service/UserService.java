@@ -19,14 +19,22 @@ public class UserService {
     }
 
     public User saveUser(User user) {
+
+        // Check user with auth_user_id already exists
+        Optional<User> existingUser = userRepository.findByAuthUserId(user.getAuthUserId());
+        if(existingUser.isPresent()){
+            throw new IllegalArgumentException("A user account with the same auth_user_id already exists");
+        }
+
         return userRepository.save(user);
     }
 
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(Integer id) {
         return userRepository.findById(id);
     }
 
-    public Optional<User> getUserByAuthId(Long authUserId) {
+    public Optional<User> getUserByAuthId(Integer authUserId) {
         return userRepository.findByAuthUserId(authUserId);
     }
+
 }

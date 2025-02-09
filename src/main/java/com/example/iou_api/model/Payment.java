@@ -2,7 +2,7 @@ package com.example.iou_api.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
@@ -11,7 +11,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private Long paymentId;
+    private Integer paymentId;
 
     @ManyToOne
     @JoinColumn(name = "debt_id", nullable = false)
@@ -25,20 +25,24 @@ public class Payment {
     private BigDecimal amount;
 
     @Column(name = "payment_date", nullable = false, updatable = false)
-    private Instant paymentDate;
+    private LocalDateTime paymentDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.paymentDate = LocalDateTime.now();
+    }
 
     public Payment() {}
 
-    public Payment(Debt debt, GroupMember payer, BigDecimal amount, Instant paymentDate) {
+    public Payment(Debt debt, GroupMember payer, BigDecimal amount ){
         this.debt = debt;
         this.payer = payer;
         this.amount = amount;
-        this.paymentDate = paymentDate;
     }
 
     // Getters and Setters
-    public Long getPaymentId() { return paymentId; }
-    public void setPaymentId(Long paymentId) { this.paymentId = paymentId; }
+    public Integer getPaymentId() { return paymentId; }
+    public void setPaymentId(Integer paymentId) { this.paymentId = paymentId; }
 
     public Debt getDebt() { return debt; }
     public void setDebt(Debt debt) { this.debt = debt; }
@@ -49,6 +53,6 @@ public class Payment {
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
 
-    public Instant getPaymentDate() { return paymentDate; }
-    public void setPaymentDate(Instant paymentDate) { this.paymentDate = paymentDate; }
+    public LocalDateTime getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
 }

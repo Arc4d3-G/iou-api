@@ -1,15 +1,16 @@
 package com.example.iou_api.model;
 
 import jakarta.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "group_members")
 public class GroupMember {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
-    private Long memberId;
+    private Integer memberId;
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
@@ -27,7 +28,12 @@ public class GroupMember {
     private Role role;
 
     @Column(name = "joined_at", nullable = false, updatable = false)
-    private Instant joinedAt;
+    private LocalDateTime joinedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.joinedAt = LocalDateTime.now();
+    }
 
     public GroupMember() {}
 
@@ -39,8 +45,8 @@ public class GroupMember {
     }
 
     // Getters and Setters
-    public Long getMemberId() { return memberId; }
-    public void setMemberId(Long memberId) { this.memberId = memberId; }
+    public Integer getMemberId() { return memberId; }
+    public void setMemberId(Integer memberId) { this.memberId = memberId; }
 
     public Group getGroup() { return group; }
     public void setGroup(Group group) { this.group = group; }
@@ -54,6 +60,6 @@ public class GroupMember {
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
-    public Instant getJoinedAt() { return joinedAt; }
-    public void setJoinedAt(Instant joinedAt) { this.joinedAt = joinedAt; }
+    public LocalDateTime getJoinedAt() { return joinedAt; }
+    public void setJoinedAt(LocalDateTime joinedAt) { this.joinedAt = joinedAt; }
 }
