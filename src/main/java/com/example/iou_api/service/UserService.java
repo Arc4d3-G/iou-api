@@ -37,4 +37,7 @@ public class UserService {
         return userRepository.findByAuthUserId(authUserId);
     }
 
+    public boolean existsByName(String name) {
+        return userRepository.existsByNameIgnoreCase(name);
+    }
 }

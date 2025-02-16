@@ -22,17 +22,19 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "currency", length = 10, nullable = false)
-    private String currency = "ZAR";
+    private Currency currency;
 
     @Column(length = 255)
     private String name;
 
     public User() {}
 
-    public User(Integer authUserId, String currency) {
+    public User(Integer authUserId, Currency currency, String name) {
         this.authUserId = authUserId;
         this.currency = currency;
+        this.name = name;
     }
 
     // Getters and Setters
@@ -45,8 +47,8 @@ public class User {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getCurrency() { return currency; }
-    public void setCurrency(String currency) { this.currency = currency; }
+    public Currency getCurrency() { return currency; }
+    public void setCurrency(Currency currency) { this.currency = currency; }
 
     public String getName() { return name;}
     public void setName(String name) { this.name = name; }

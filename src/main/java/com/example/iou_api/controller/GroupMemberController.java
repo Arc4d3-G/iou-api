@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/group-members")
+@RequestMapping("/iou/group-members")
 public class GroupMemberController {
     private final GroupMemberService groupMemberService;
 

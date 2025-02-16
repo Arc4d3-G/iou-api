@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/debts")
+@RequestMapping("/iou/debts")
 public class DebtController {
 
     private final DebtService debtService;
